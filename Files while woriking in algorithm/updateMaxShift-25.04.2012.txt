@@ -1,0 +1,66 @@
+static void updateMaxShift(int TourIndex, int VisitIndex, float NewVisitMaxShiftValues[],
+            int TourLastVisit[][], clsVisit Itinerary[][], 
+            float InsertedVisitEndTime, int InsertedPOI_ID,float TimeShiftOfPreceidingPOIs,
+            float MaxShift[][][]) {// Testimi OK
+        for(int MaxShiftIndex=0;MaxShiftIndex<=1;MaxShiftIndex++){//  MaxShiftIndex=0 updates Right Shift
+                                                                  //  MaxShiftIndex=1 updates Left Shift
+                     
+            
+           
+            if (NewVisitMaxShiftValues[MaxShiftIndex] < MaxShift[TourIndex][MaxShiftIndex][VisitIndex]) {
+                    for (int i = 0; i < VisitIndex; i++) {
+                        if (!(MaxShift[TourIndex][MaxShiftIndex][i] <= NewVisitMaxShiftValues[MaxShiftIndex])) {
+                            MaxShift[TourIndex][MaxShiftIndex][i] = NewVisitMaxShiftValues[MaxShiftIndex];
+                        }
+                    }
+                } else if((NewVisitMaxShiftValues[MaxShiftIndex] > MaxShift[TourIndex][MaxShiftIndex][VisitIndex])
+                            && ((!(VisitIndex == TourLastVisit[1][TourIndex]) && 
+                            (NewVisitMaxShiftValues[MaxShiftIndex] < MaxShift[TourIndex][MaxShiftIndex][VisitIndex + 1]))
+                            || (VisitIndex == TourLastVisit[1][TourIndex]))
+                            && (!(VisitIndex == 0) && (NewVisitMaxShiftValues[MaxShiftIndex] > MaxShift[TourIndex][MaxShiftIndex][VisitIndex - 1]))
+                            //Azhurinimi i MaxShift nese vlera e re e tij eshte me e madhe se vlera momentale
+                        ) 
+                {
+                    for (int i = VisitIndex - 1; i >= 0; i--) {
+                        float CurrentVisitMaxShift;
+                        if(MaxShiftIndex==0)
+                            CurrentVisitMaxShift= getMaxRightShift(Itinerary[TourIndex][i].POI_ID,
+                            Itinerary[TourIndex][i].constraints.TimeWindow.EndTime);
+                        else
+                             CurrentVisitMaxShift= getMaxLeftShift(Itinerary[TourIndex][i].POI_ID,
+                        Itinerary[TourIndex][i].constraints.TimeWindow.StartTime);
+                        
+                        if (i == VisitIndex - 1) {
+                            if (CurrentVisitMaxShift < NewVisitMaxShiftValues[MaxShiftIndex]) {
+                                MaxShift[TourIndex][MaxShiftIndex][i] = CurrentVisitMaxShift;
+                            } else {
+                                MaxShift[TourIndex][MaxShiftIndex][i] = NewVisitMaxShiftValues[MaxShiftIndex];
+                            }
+                        } else {
+                            if (CurrentVisitMaxShift < MaxShift[TourIndex][MaxShiftIndex][i + 1]) {
+                                MaxShift[TourIndex][MaxShiftIndex][i] = CurrentVisitMaxShift;
+                            } else {
+                                MaxShift[TourIndex][MaxShiftIndex][i] = MaxShift[TourIndex][MaxShiftIndex][i + 1];
+                            }
+                        }
+                    }
+                }
+
+                if (!(VisitIndex == TourLastVisit[1][TourIndex]) && 
+                        (NewVisitMaxShiftValues[MaxShiftIndex] >= MaxShift[TourIndex][MaxShiftIndex][VisitIndex + 1])) {
+                    MaxShift[TourIndex][MaxShiftIndex][VisitIndex] = MaxShift[TourIndex][MaxShiftIndex][VisitIndex + 1];
+                } else {
+                    MaxShift[TourIndex][MaxShiftIndex][VisitIndex] = NewVisitMaxShiftValues[MaxShiftIndex];
+                }
+
+               if( !(VisitIndex == TourLastVisit[1][TourIndex])  &&  TimeShiftOfPreceidingPOIs!=0 ){// Update max shift of Preceiding POIs
+                 for(int i=VisitIndex+1;i<=TourLastVisit[1][TourIndex];i++){                 
+                    if(MaxShiftIndex==0)
+                        MaxShift[TourIndex][MaxShiftIndex][i]-=(TimeShiftOfPreceidingPOIs);
+                    else
+                        MaxShift[TourIndex][MaxShiftIndex][i]+=(TimeShiftOfPreceidingPOIs);
+                }
+            }  
+                
+        }
+  }

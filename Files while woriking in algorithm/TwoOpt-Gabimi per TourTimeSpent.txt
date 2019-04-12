@@ -1,0 +1,87 @@
+//Test
+                    float CalculatedTourTimeSpent=TourSpentTime+RemoveingTourShiftingValue+
+                            InsertingTourShiftingValue;
+                    
+                    float dLeftPrevious;
+                    if(LeftPOIIndex==0)
+                        dLeftPrevious=clsGeneral.getDistanceBetweenPoints(1, RightPOIID, clsData.getDistance());
+                    else
+                        dLeftPrevious=clsGeneral.getDistanceBetweenPoints(TourItinerary[LeftPOIIndex-1].POI_ID, RightPOIID, clsData.getDistance());
+                          
+                    float dLeftNext;
+                    
+                    if(LeftPOIIndex==RightPOIIndex-1)
+                        dLeftNext=TourItinerary[LeftPOIIndex].constraints.TimeWindow.DistanceToNextPoint;
+                    else
+                        dLeftNext=clsGeneral.getDistanceBetweenPoints(RightPOIID,TourItinerary[LeftPOIIndex+1].POI_ID, clsData.getDistance());
+                    
+                    float dRightPrevious;
+                    
+                    if(LeftPOIIndex==RightPOIIndex-1)
+                        dRightPrevious=TourItinerary[LeftPOIIndex].constraints.TimeWindow.DistanceToNextPoint;
+                    else
+                        dRightPrevious=clsGeneral.getDistanceBetweenPoints(TourItinerary[RightPOIIndex-1].POI_ID,LeftPOIID, clsData.getDistance());
+
+                    float dRightNext;
+                    if(RightPOIIndex==TourLastVisit)
+                        dRightNext=clsGeneral.getDistanceBetweenPoints(LeftPOIID, 1, clsData.getDistance());
+                    else
+                        dRightNext=clsGeneral.getDistanceBetweenPoints(LeftPOIID,TourItinerary[RightPOIIndex+1].POI_ID, clsData.getDistance());
+                   
+                    float LeftShiftingValue=                            
+                            -TourItinerary[LeftPOIIndex].constraints.TimeWindow.DistanceFromPrevioiusPoint
+                            -clsData.getPOI()[LeftPOIID-2][3]
+                            -TourItinerary[LeftPOIIndex].constraints.TimeWindow.DistanceToNextPoint
+                            +dLeftPrevious
+                            +clsData.getPOI()[RightPOIID-2][3]
+                            +dLeftNext;
+                    
+                    float RightShiftingValue=
+                             -TourItinerary[RightPOIIndex].constraints.TimeWindow.DistanceFromPrevioiusPoint
+                            -clsData.getPOI()[RightPOIID-2][3]
+                            -TourItinerary[RightPOIIndex].constraints.TimeWindow.DistanceToNextPoint
+                            +dRightPrevious
+                            +clsData.getPOI()[LeftPOIID-2][3]
+                            +dRightNext;;
+                   
+                            
+                     if(Math.abs(DistanceFromPreviosPointToInsertedPointInRemoveingTour-dLeftPrevious)>0.5){
+                         System.out.println("DistanceFromPreviosPointToInsertedPointInRemoveingTour="+
+                                 DistanceFromPreviosPointToInsertedPointInRemoveingTour);
+                         System.out.println("dLeftPrevious="+dLeftPrevious);
+                         
+                          System.out.println("Gabim");
+                     }    
+                     
+                     if(Math.abs(DistanceFromInsertedPointToNextPointInRemoveingTour-dLeftNext)>0.5){
+                         System.out.println("DistanceFromInsertedPointToNextPointInRemoveingTour="+
+                                 DistanceFromInsertedPointToNextPointInRemoveingTour);
+                         System.out.println("dLeftNext="+dLeftNext);
+                         
+                          System.out.println("Gabim");
+                     }  
+                            
+                     if(Math.abs(RemoveingTourShiftingValue-LeftShiftingValue)>0.5){
+                         System.out.println("RemoveingTourShiftingValue="+RemoveingTourShiftingValue);
+                         System.out.println("LeftShiftingValue="+LeftShiftingValue);
+                         
+                          System.out.println("Gabim");
+                     }
+                     if(Math.abs(InsertingTourShiftingValue-RightShiftingValue)>0.5){
+                         System.out.println("InsertingTourShiftingValue="+InsertingTourShiftingValue);
+                         System.out.println("RightShiftingValue="+RightShiftingValue);
+                         
+                          System.out.println("Gabim");
+                     }                        
+                            
+                    float RealTourTimeSpent=TourSpentTime+LeftShiftingValue+RightShiftingValue;
+
+                    if(Math.abs(RealTourTimeSpent-CalculatedTourTimeSpent)>0.5){
+                        
+                        System.out.println("RealTourTimeSpent="+RealTourTimeSpent);
+                        System.out.println("CalculatedTourTimeSpent="+CalculatedTourTimeSpent);
+                        System.out.println("Gabim");
+                    }
+                    
+                    //Test
+                    

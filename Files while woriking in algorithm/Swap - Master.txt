@@ -1,0 +1,149 @@
+clsNeighborSolution getBestNeighborOfCurrentSolution(ArrayList<clsTour> currentListOfTours,
+                                                        clsTripEvaluation currentTripEvaluation,
+                                                        int iterationNumber,
+                                                        int[][]SwapRecencyBasedMemory,
+                                                        int[][]SwapFrequencyBasedMemory,
+                                                        boolean SearchDiversificationNeeded,
+                                                        int [] ListOfPOIsCurrentlyInTrip,
+                                                        int [] ListOfPOIsCurrentlyNotInTrip,
+                                                        int TABU_LIST_SIZE,
+                                                        double PENALTY_COEFFICIENT)
+    {
+        clsNeighborSolution bestNeighbor=new clsNeighborSolution();
+        float fltCurrentNeighborEvaluation=0;
+        bestNeighbor.setNonTabuSolutionEvaluation(0);
+        bestNeighbor.setTabuSolutionEvaluation(0);
+        bestNeighbor.getProposedVisitForNonTabuSolution().setTripCost(0);
+        bestNeighbor.getProposedVisitForTabuSolution().setTripCost(0);
+        //int NumberOfNighbors=POIsCurrentlyNotInTrip.length*POIsCurrentlyInTrip.length;
+        int IndeksToBeSwapt=0;
+
+        //
+        for(int indeksOfPOINotInTrip=0;indeksOfPOINotInTrip<ListOfPOIsCurrentlyNotInTrip.length;
+                        indeksOfPOINotInTrip++)
+        {
+            for(int indeksOfTour=0;indeksOfTour<currentListOfTours.size();indeksOfTour++)
+            {
+                for(int indeksOfVisit=0; indeksOfVisit<currentListOfTours.get(indeksOfTour).ListOfVisits.size();
+                                       indeksOfVisit++)
+                {
+                    int []neighbor=generateNeighbor(ListOfPOIsCurrentlyInTrip.length,
+                            IndeksToBeSwapt,indeksOfPOINotInTrip,
+                            ListOfPOIsCurrentlyInTrip,ListOfPOIsCurrentlyNotInTrip);
+                    boolean hasSwapOccuredInLastVisitOfTour=
+                            indeksOfVisit==currentListOfTours.get(indeksOfTour).ListOfVisits.size()-1;
+                    clsProposedVisit proposedTripVisit=getProposedTripVisit(
+                            neighbor,
+                            IndeksToBeSwapt,
+                            ListOfPOIsCurrentlyInTrip[IndeksToBeSwapt],
+                            currentTripEvaluation.getTripCost(),
+                            indeksOfVisit,
+                            hasSwapOccuredInLastVisitOfTour,
+                            currentListOfTours.get(indeksOfTour));
+                   boolean isNeighborLegal=proposedTripVisit.getTripCost()!=0;
+                   if(isNeighborLegal)
+                   {
+
+                       clsTripEvaluation neighborEvaluation=new clsTripEvaluation();
+                       float neighborSatisfactionFactor=
+                               currentTripEvaluation.getSatisfactionFactor()+
+                               ListOfTouristEntities.get(neighbor[IndeksToBeSwapt]-1).getSatisfactionFactor()-
+                               ListOfTouristEntities.get(ListOfPOIsCurrentlyInTrip[IndeksToBeSwapt]-1).getSatisfactionFactor();
+                       neighborEvaluation.setSatisfactionFactor(neighborSatisfactionFactor);
+
+
+                       int IDOfPreviousPOI;
+                       int IDOfSwappingPOI=neighbor[IndeksToBeSwapt];
+                       int IDOfSweptPOI=ListOfPOIsCurrentlyInTrip[IndeksToBeSwapt];
+                       int IDOfNextPOI;
+                       if(indeksOfVisit==0)
+                           IDOfPreviousPOI=-1;
+                       else
+                           IDOfPreviousPOI=neighbor[IndeksToBeSwapt-1];
+                       if(hasSwapOccuredInLastVisitOfTour)
+                           IDOfNextPOI=-2;
+                       else
+                           IDOfNextPOI=neighbor[IndeksToBeSwapt+1];
+                       int neighborTravelTime=
+                       currentTripEvaluation.getTravelTime()+
+                               getSwapInsertTravelTime(IDOfSwappingPOI,IDOfPreviousPOI,IDOfNextPOI)-
+                               getSwapInsertTravelTime(IDOfSweptPOI,IDOfPreviousPOI,IDOfNextPOI);
+
+//                       if(neighborTravelTime<0)
+//                       {
+//                           System.out.println("neighborTravelTime:" +">>>"+neighborTravelTime+"<<<, in iteration"+iterationNumber);
+//                           System.out.println("POIsCurrentlyInTrip");
+//                           printPOIs(ListOfPOIsCurrentlyInTrip);
+//                           System.out.println("Current neighbor");
+//                           printPOIs(neighbor);
+//                           System.out.println("IndeksToBeSwapt:"+IndeksToBeSwapt);
+//                           System.out.println("indeksOfTour:"+indeksOfTour);
+//                           System.out.println("indeksOfVisit:"+indeksOfVisit);
+//                           System.out.println("IDOfSwappingPOI:"+IDOfSwappingPOI);
+//                           System.out.println("IDOfPreviousPOI:"+IDOfPreviousPOI);
+//                           System.out.println("IDOfNextPOI:"+IDOfNextPOI);
+//                           System.out.println("IDOfSweptPOI:"+IDOfSweptPOI);
+//                       }
+                       neighborEvaluation.setTravelTime(neighborTravelTime);
+                       boolean isNeighborTabu=isSolutionTabu(SwapRecencyBasedMemory,
+                               ListOfPOIsCurrentlyInTrip[IndeksToBeSwapt],neighbor[IndeksToBeSwapt],iterationNumber,TABU_LIST_SIZE);
+                       fltCurrentNeighborEvaluation=neighborEvaluation.getTripEvaluation(
+                                   bestTrip.getWeightOfSatisfactionFactor(),
+                                   bestTrip.getWeightOfTravelTime(),
+                                   fltMaximalSatisfactionFactor,
+                                   fltTripDurationWithoutBreaks);
+                       if(isNeighborTabu)
+                       {
+                           if(bestNeighbor.getTabuSolutionEvaluation()<=fltCurrentNeighborEvaluation)
+                           {
+                               bestNeighbor.setTabuSolutionEvaluation(fltCurrentNeighborEvaluation);
+                               bestNeighbor.setTabuSatisfactionFactor(neighborEvaluation.getSatisfactionFactor());
+                               bestNeighbor.setTabuTravelTime(neighborEvaluation.getTravelTime());
+                               bestNeighbor.setIndeksOfSwaptPOIForTabuSolution(IndeksToBeSwapt);
+                               bestNeighbor.setIndeksOfSwappingPOIForTabuSolution(indeksOfPOINotInTrip);
+                               bestNeighbor.setIndeksOfTourWhereInsertOccuredForTabuSolution(indeksOfTour);
+                               bestNeighbor.setIndeksOfVisitInTourWhereInsertOccuredForTabuSolution(indeksOfVisit);
+                               bestNeighbor.setProposedVisitForTabuSolution(proposedTripVisit);
+                               //System.out.println("TabuSolutionEvaluation:" +bestNeighbor.getTabuSolutionEvaluation());
+                           }
+
+                       }
+                       else
+                       {
+                           double penalty=0;
+                           if(SearchDiversificationNeeded)
+                           {
+                               int frequencyMemoryValue=getFrequencyMemoryValue(
+                                       SwapFrequencyBasedMemory,
+                                       ListOfPOIsCurrentlyInTrip[IndeksToBeSwapt],
+                                       neighbor[IndeksToBeSwapt]);
+                               penalty=PENALTY_COEFFICIENT*frequencyMemoryValue;
+                           }
+                           if(penalty>fltCurrentNeighborEvaluation)
+                               System.out.println("Vlera e evaluimit do te behet negative...");
+                           if(bestNeighbor.getNonTabuSolutionEvaluation()<=fltCurrentNeighborEvaluation -penalty)
+                           {
+                               bestNeighbor.setNonTabuSolutionEvaluation(fltCurrentNeighborEvaluation);
+                               bestNeighbor.setNonTabuSatisfactionFactor(neighborEvaluation.getSatisfactionFactor());
+                               bestNeighbor.setNonTabuTravelTime(neighborEvaluation.getTravelTime());
+                               bestNeighbor.setIndeksOfSwaptPOIForNonTabuSolution(IndeksToBeSwapt);
+                               bestNeighbor.setIndeksOfSwappingPOIForNonTabuSolution(indeksOfPOINotInTrip);
+                               bestNeighbor.setIndeksOfTourWhereInsertOccuredForNonTabuSolution(indeksOfTour);
+                               bestNeighbor.setIndeksOfVisitInTourWhereInsertOccuredForNonTabuSolution(indeksOfVisit);
+                               bestNeighbor.setProposedVisitForNonTabuSolution(proposedTripVisit);
+                               //System.out.println("NonTabuSolutionEvaluation:" +bestNeighbor.getNonTabuSolutionEvaluation());
+                           }
+                       }
+
+                   }
+
+                   IndeksToBeSwapt++;
+                   if(IndeksToBeSwapt==ListOfPOIsCurrentlyInTrip.length)
+                   {
+                       IndeksToBeSwapt=0;
+                   }
+                }
+            }
+        }
+        return bestNeighbor;
+   }

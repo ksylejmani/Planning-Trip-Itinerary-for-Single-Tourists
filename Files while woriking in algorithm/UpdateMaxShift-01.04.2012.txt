@@ -1,0 +1,79 @@
+void updateMaxShift(int TourIndex, int VisitIndex, float NewVisitMaxShiftValues[],
+            int TourLastVisit[][], clsVisit Itinerary[][], float MaxShift[][][]) {
+
+        //Update Right Shift
+        if (NewVisitMaxShiftValues[0] < MaxShift[TourIndex][0][VisitIndex]) {
+            for (int i = 0; i < VisitIndex; i++) {
+                if (!(MaxShift[TourIndex][0][i] <= NewVisitMaxShiftValues[0])) {
+                    MaxShift[TourIndex][0][i] = NewVisitMaxShiftValues[0];
+                }
+            }
+        } else if ((NewVisitMaxShiftValues[0] > MaxShift[TourIndex][0][VisitIndex])
+                && ((!(VisitIndex == TourLastVisit[1][TourIndex]) && (NewVisitMaxShiftValues[0] < MaxShift[TourIndex][0][VisitIndex + 1]))
+                || (VisitIndex == TourLastVisit[1][TourIndex]))
+                && (!(VisitIndex == 0) && (NewVisitMaxShiftValues[0] > MaxShift[TourIndex][0][VisitIndex - 1]))//Azhurinimi i MaxRightShift nese vlera e 
+                ) // re e tij eshte me e madhe se vlera momentale
+        {
+            for (int i = VisitIndex - 1; i >= 0; i--) {
+                float MaxRightShift = getMaxRightShift(Itinerary[TourIndex][i].POI_ID,
+                        Itinerary[TourIndex][i].constraints.TimeWindow.EndTime);
+                if (i == VisitIndex - 1) {
+                    if (MaxRightShift < NewVisitMaxShiftValues[0]) {
+                        MaxShift[TourIndex][0][i] = MaxRightShift;
+                    } else {
+                        MaxShift[TourIndex][0][i] = NewVisitMaxShiftValues[0];
+                    }
+                } else {
+                    if (MaxRightShift < MaxShift[TourIndex][0][i + 1]) {
+                        MaxShift[TourIndex][0][i] = MaxRightShift;
+                    } else {
+                        MaxShift[TourIndex][0][i] = MaxShift[TourIndex][0][i + 1];
+                    }
+                }
+            }
+        }
+
+        if (!(VisitIndex == TourLastVisit[1][TourIndex]) && (NewVisitMaxShiftValues[0] >= MaxShift[TourIndex][0][VisitIndex + 1])) {
+            MaxShift[TourIndex][0][VisitIndex] = MaxShift[TourIndex][0][VisitIndex + 1];
+        } else {
+            MaxShift[TourIndex][0][VisitIndex] = NewVisitMaxShiftValues[0];
+        }
+
+        //Update Left Shift
+        if (NewVisitMaxShiftValues[1] < MaxShift[TourIndex][1][VisitIndex]) {
+            for (int i = 0; i < VisitIndex; i++) {
+                if (!(MaxShift[TourIndex][1][i] <= NewVisitMaxShiftValues[1])) {
+                    MaxShift[TourIndex][1][i] = NewVisitMaxShiftValues[1];
+                }
+            }
+        } else if ((NewVisitMaxShiftValues[1] > MaxShift[TourIndex][1][VisitIndex])
+                && ((!(VisitIndex == TourLastVisit[1][TourIndex]) && (NewVisitMaxShiftValues[1] < MaxShift[TourIndex][1][VisitIndex + 1]))
+                || (VisitIndex == TourLastVisit[1][TourIndex]))
+                && (!(VisitIndex == 0) && (NewVisitMaxShiftValues[1] > MaxShift[TourIndex][1][VisitIndex - 1]))//Azhurinimi i MaxLeftShift nese vlera e 
+                ) // re e tij eshte me e madhe se vlera momentale
+        {
+            for (int i = VisitIndex - 1; i >= 0; i--) {
+                float MaxLeftShift = getMaxLeftShift(Itinerary[TourIndex][i].POI_ID,
+                        Itinerary[TourIndex][i].constraints.TimeWindow.StartTime);
+                if (i == VisitIndex - 1) {
+                    if (MaxLeftShift < NewVisitMaxShiftValues[1]) {
+                        MaxShift[TourIndex][1][i] = MaxLeftShift;
+                    } else {
+                        MaxShift[TourIndex][1][i] = NewVisitMaxShiftValues[1];
+                    }
+                } else {
+                    if (MaxLeftShift < MaxShift[TourIndex][1][i + 1]) {
+                        MaxShift[TourIndex][1][i] = MaxLeftShift;
+                    } else {
+                        MaxShift[TourIndex][1][i] = MaxShift[TourIndex][1][i + 1];
+                    }
+                }
+            }
+        }
+
+        if (!(VisitIndex == TourLastVisit[1][TourIndex]) && (NewVisitMaxShiftValues[1] >= MaxShift[TourIndex][1][VisitIndex + 1])) {
+            MaxShift[TourIndex][1][VisitIndex] = MaxShift[TourIndex][1][VisitIndex + 1];
+        } else {
+            MaxShift[TourIndex][1][VisitIndex] = NewVisitMaxShiftValues[1];
+        }
+    }

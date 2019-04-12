@@ -1,0 +1,20 @@
+                                clsHeuristicFunction hf=new clsHeuristicFunction();
+                                int LeftPoint,RightPoint;
+                                if(j==0)
+                                    LeftPoint=1;
+                                else
+                                    LeftPoint=solution.Itinerary[i][j-1].POI_ID;
+                                if(j==solution.TourLastVisit[1][i])
+                                    RightPoint=1;
+                                else
+                                    RightPoint=solution.Itinerary[i][j+1].POI_ID;
+                                
+                                float InsertedPointTimeOfAssignment;
+                                InsertedPointTimeOfAssignment=IndicatedStartAndEndTime[0]+
+                                        (IndicatedStartAndEndTime[1]-IndicatedStartAndEndTime[0])/2;
+                                float RemovedPointTimeOfAssignment=solution.Itinerary[i][j].constraints.TimeWindow.StartTime+
+                                        (solution.Itinerary[i][j].constraints.TimeWindow.EndTime-
+                                        solution.Itinerary[i][j].constraints.TimeWindow.StartTime)/2;
+                                float IndertedPoint_hf_eval=hf.getHeuristicEvaluation(InsertedPOI_ID, LeftPoint, RightPoint, InsertedPointTimeOfAssignment);
+                                float RemovedPoint_hf_eval=hf.getHeuristicEvaluation(RemovedPOI_ID, LeftPoint, RightPoint, RemovedPointTimeOfAssignment);
+                                float CurrentHeuristicFunctionEvaluation=IndertedPoint_hf_eval-RemovedPoint_hf_eval;

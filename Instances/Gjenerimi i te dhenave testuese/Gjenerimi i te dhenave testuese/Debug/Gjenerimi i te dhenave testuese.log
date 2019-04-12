@@ -1,0 +1,26 @@
+﻿Build started 4/5/2012 10:48:41 AM.
+     1>Project "D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Gjenerimi i te dhenave testuese\Gjenerimi i te dhenave testuese.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\Gjenerimi i te dhenave testuese.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       GenerateTargetFrameworkMonikerAttribute:
+       Skipping target "GenerateTargetFrameworkMonikerAttribute" because all output files are up-to-date with respect to the input files.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" /Zi /clr /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /TP /analyze- /errorReport:prompt 1.cpp /clr:nostdlib 
+         1.cpp
+     1>1.cpp(13): warning C4101: 'X' : unreferenced local variable
+     1>1.cpp(45): warning C4018: '<' : signed/unsigned mismatch
+         All outputs are up-to-date.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Debug\Gjenerimi i te dhenave testuese.exe" /INCREMENTAL /NOLOGO /MANIFEST /ManifestFile:"Debug\Gjenerimi i te dhenave testuese.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Debug\Gjenerimi i te dhenave testuese.pdb" /ASSEMBLYDEBUG /TLBID:1 /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 Debug\1.obj
+         "Debug\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
+         Gjenerimi i te dhenave testuese.vcxproj -> D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Debug\Gjenerimi i te dhenave testuese.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Debug\Gjenerimi i te dhenave testuese.exe;#1" /manifest "Debug\Gjenerimi i te dhenave testuese.exe.intermediate.manifest"
+       FinalizeBuildStatus:
+         Deleting file "Debug\Gjenerimi i te dhenave testuese.unsuccessfulbuild".
+         Touching "Debug\Gjenerimi i te dhenave testuese.lastbuildstate".
+     1>Done Building Project "D:\Studimet per doktorature\PhD thesis\Test instances\Gjenerimi i te dhenave testuese\Gjenerimi i te dhenave testuese\Gjenerimi i te dhenave testuese.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:03.51

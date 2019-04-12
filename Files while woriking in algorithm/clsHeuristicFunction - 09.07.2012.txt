@@ -1,0 +1,193 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package ClassLibrary;
+
+/**
+ *
+ * @author user
+ */
+public class clsHeuristicFunction {
+    
+     static float wEntreeFee = 0.00f;
+     static float wTravelingDistance = 1.0f;
+     static float wVisitTime = 0.0f;
+     static float wTimeWindow = 0.0f;
+     static float wSatisfactionFactor = 0.0f;
+     static float wTypeConstraint = 0.0f;
+     static float wTWConflicts=1.0f;
+
+     
+     static void updateWeights(int IterationsWithoutImprovement, int WeightStep){
+         
+         int WeightSelector=IterationsWithoutImprovement%(6*WeightStep);
+         if(WeightSelector<WeightStep)
+         {
+             wEntreeFee=0.0f;
+             wTravelingDistance=0.1f;
+             wVisitTime = 0.3f;
+             wTimeWindow = 0.3f;
+             wSatisfactionFactor = 0.1f;
+             wTypeConstraint = 0.0f;
+         }
+         else if(WeightSelector>=WeightStep &&WeightSelector<2*WeightStep)
+         {
+             wEntreeFee=0.0f;
+             wTravelingDistance=0.0f;
+             wVisitTime = 0.1f;
+             wTimeWindow = 0.3f;
+             wSatisfactionFactor = 0.3f;
+             wTypeConstraint = 0.1f;
+         }
+         else if(WeightSelector>=2*WeightStep && WeightSelector<3*WeightStep)
+         {
+             wEntreeFee=0.1f;
+             wTravelingDistance=0.0f;
+             wVisitTime = 0.0f;
+             wTimeWindow = 0.1f;
+             wSatisfactionFactor = 0.3f;
+             wTypeConstraint = 0.3f;
+         }
+         else if(WeightSelector>=3*WeightStep && WeightSelector<4*WeightStep)
+         {
+             wEntreeFee=0.3f;
+             wTravelingDistance=0.1f;
+             wVisitTime = 0.0f;
+             wTimeWindow = 0.0f;
+             wSatisfactionFactor = 0.1f;
+             wTypeConstraint = 0.3f;
+         }
+        else if(WeightSelector>=4*WeightStep && WeightSelector<5*WeightStep)
+         {
+             wEntreeFee=0.3f;
+             wTravelingDistance=0.3f;
+             wVisitTime = 0.1f;
+             wTimeWindow = 0.0f;
+             wSatisfactionFactor = 0.0f;
+             wTypeConstraint = 0.1f;
+         }
+        else if(WeightSelector>=5*WeightStep && WeightSelector<6*WeightStep)
+         {
+             wEntreeFee=0.1f;
+             wTravelingDistance=0.3f;
+             wVisitTime = 0.3f;
+             wTimeWindow = 0.1f;
+             wSatisfactionFactor = 0.0f;
+             wTypeConstraint = 0.0f;
+         }
+     }
+    
+    static float getHeuristicEvaluation(int POI_ID,int LeftPoint, int RightPoint,float TimeOfAssignment,int NumberOfPOIsInItinerary,
+            int NumberOfConflicts){
+        float result=wSatisfactionFactor*clsData.getNormalisedSF(POI_ID)+
+                wTravelingDistance*getTimeConsumption(POI_ID, LeftPoint, LeftPoint)+
+                wVisitTime*getVisitTime(POI_ID, TimeOfAssignment)+
+                wTimeWindow*clsData.getNormalisedTimeWindow(POI_ID)+
+                wEntreeFee*(1-clsData.getNormalisedEntreeFee(POI_ID))+
+                wTypeConstraint*clsData.getNormalisedTypeConstraint(POI_ID)+
+                wTWConflicts*(1-NumberOfConflicts/(float)NumberOfPOIsInItinerary);
+        return result;
+    }
+    
+    static float getTimeConsumption(int Point, int LeftPOInt, int RightPoint){
+        float result;
+        result=1-(clsData.getNormalisedDistance(Point, LeftPOInt)+clsData.getNormalisedVistDuration(Point)+
+                clsData.getNormalisedDistance(Point, RightPoint))/3;
+        return result;
+    }
+    
+    static float getVisitTime(int POI_ID, float AssignedTime){
+        float result=1-Math.abs((AssignedTime-clsData.getPOIMiddleOfTimeWindow(POI_ID))/
+                clsData.getMaxDiscrepanceFromMidPoint(POI_ID));
+        return result;
+    }
+    
+    static float getSwapEvaluation(int InsertedPOI_ID, int VisitIndex,clsVisit Itinerary[],
+                                      int TourLastVisit, float IndicatedStartTime, float IndicatedEndTime,
+                                      int NumberOfPOIsInItinerary, int NumberOfConflicts){
+        float result;
+        int LeftPoint,RightPoint;
+        if(VisitIndex==0)
+            LeftPoint=1;
+        else
+            LeftPoint=Itinerary[VisitIndex-1].POI_ID;
+        if(VisitIndex==TourLastVisit)
+            RightPoint=1;
+        else
+            RightPoint=Itinerary[VisitIndex+1].POI_ID;
+
+        float InsertedPointTimeOfAssignment;
+        InsertedPointTimeOfAssignment=IndicatedStartTime+ (IndicatedEndTime-IndicatedStartTime)/2;
+        result=getHeuristicEvaluation(InsertedPOI_ID, LeftPoint, RightPoint, InsertedPointTimeOfAssignment,
+                NumberOfPOIsInItinerary,NumberOfConflicts);
+        return result;
+    }
+    static float getNeighboorSwapEvaluationInRemoveingTour(int InsertedPOI_ID, int VisitIndex,clsVisit Itinerary[],
+                                      int TourLastVisit, float IndicatedStartTime, float IndicatedEndTime,
+                                       int NumberOfPOIsInItinerary, int NumberOfConflicts){
+        float result;
+        int LeftPoint,RightPoint;
+        if(VisitIndex==0)
+            LeftPoint=1;
+        else
+            LeftPoint=Itinerary[VisitIndex-1].POI_ID;
+        RightPoint=Itinerary[VisitIndex].POI_ID;
+
+        float InsertedPointTimeOfAssignment;
+        InsertedPointTimeOfAssignment=IndicatedStartTime+ (IndicatedEndTime-IndicatedStartTime)/2;
+        result=getHeuristicEvaluation(InsertedPOI_ID, LeftPoint, RightPoint, InsertedPointTimeOfAssignment,
+                NumberOfPOIsInItinerary,NumberOfConflicts);
+        return result;
+    }
+    static float getNeighboorSwapEvaluationInInsertingTour(int InsertedPOI_ID, int VisitIndex,clsVisit Itinerary[],
+                                      int TourLastVisit, float IndicatedStartTime, float IndicatedEndTime,
+                                       int NumberOfPOIsInItinerary, int NumberOfConflicts){
+        float result;
+        int LeftPoint,RightPoint;
+        LeftPoint=Itinerary[VisitIndex].POI_ID;
+        if(VisitIndex==TourLastVisit)
+            RightPoint=1;
+        else
+            RightPoint=Itinerary[VisitIndex+1].POI_ID;
+
+        float InsertedPointTimeOfAssignment;
+        InsertedPointTimeOfAssignment=IndicatedStartTime+ (IndicatedEndTime-IndicatedStartTime)/2;
+        result=getHeuristicEvaluation(InsertedPOI_ID, LeftPoint, RightPoint, InsertedPointTimeOfAssignment,
+                NumberOfPOIsInItinerary,NumberOfConflicts);
+        return result;
+    }
+    static float getSwapInEvaluation(int RemovedPOI_ID, int InsertedPOI_ID, 
+                                     int VisitIndexInRemoveingTour,int VisitIndexInInsertingTour,
+                                     clsVisit RemoveingTourItinerary[], clsVisit InsertingTourItinerary[],
+                                     int LastVisitIndexInRemoveingTour, int LastVisitIndexInInsertingTour,
+                                     float IndicatedStartTimeInRemoveingTour, float IndicatedEndTimeInRemoveingTour,
+                                     float IndicatedStartTimeInInsertingTour, float IndicatedEndTimeInInsertingTour,
+                                     boolean SwapBetweenNeighbourPOIs,
+                                     int NumberOfPOIsInItinerary, int NumberOfConflicts){
+        float result;
+        float RemoveingTourEvaluation,InsertingTourEvaluation;
+        if(SwapBetweenNeighbourPOIs){
+            RemoveingTourEvaluation=getNeighboorSwapEvaluationInRemoveingTour(InsertedPOI_ID,VisitIndexInRemoveingTour,RemoveingTourItinerary,
+                    LastVisitIndexInRemoveingTour,IndicatedStartTimeInRemoveingTour,IndicatedEndTimeInRemoveingTour,
+                    NumberOfPOIsInItinerary,NumberOfConflicts);
+            InsertingTourEvaluation=getNeighboorSwapEvaluationInInsertingTour(RemovedPOI_ID,VisitIndexInInsertingTour,
+                    InsertingTourItinerary,LastVisitIndexInInsertingTour,
+                    IndicatedStartTimeInInsertingTour,IndicatedEndTimeInInsertingTour,
+                    NumberOfPOIsInItinerary,NumberOfConflicts);  
+        }
+        else
+        {
+            RemoveingTourEvaluation=getSwapEvaluation(InsertedPOI_ID,VisitIndexInRemoveingTour,RemoveingTourItinerary,
+                    LastVisitIndexInRemoveingTour,IndicatedStartTimeInRemoveingTour,IndicatedEndTimeInRemoveingTour,
+                    NumberOfPOIsInItinerary,NumberOfConflicts);
+            InsertingTourEvaluation=getSwapEvaluation(RemovedPOI_ID,VisitIndexInInsertingTour,
+                    InsertingTourItinerary,LastVisitIndexInInsertingTour,
+                    IndicatedStartTimeInInsertingTour,IndicatedEndTimeInInsertingTour,
+                    NumberOfPOIsInItinerary,NumberOfConflicts);
+        }
+
+        result=RemoveingTourEvaluation+InsertingTourEvaluation;
+        return result;
+    }
+}
